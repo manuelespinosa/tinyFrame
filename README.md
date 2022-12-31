@@ -26,3 +26,10 @@ void loop(){
   delay(10000);
 }
 ```
+
+## Console output
+```console
+val_uint8 = input.bytes[0] << 0;
+val_int16 = (input.bytes[1] << 0 | input.bytes[2] << 8) << 16 >> 16;
+Frame [Hex]: 0x87 0x30 0x75
+```
