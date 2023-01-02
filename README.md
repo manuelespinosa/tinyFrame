@@ -10,7 +10,6 @@ Tiny Frame for Arduino with TTN Decoder helper
 struct tinyFrame frame;
 
 void setup(){
-
   frame.printDecoder = true; // if you want to see TTN / javascript decoder helper
 }
 
