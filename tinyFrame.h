@@ -94,6 +94,7 @@ struct tinyFrame {
         }
         FRAME_SERIAL.println();
     }
+
     void hexChar(char *buff, uint16_t size){
         if (size < idx*2){
             FRAME_SERIAL.println("no enough size to hexChar representation");
