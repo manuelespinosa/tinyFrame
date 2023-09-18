@@ -101,11 +101,10 @@ struct tinyFrame {
             return;
         }
         strcpy(buff, "");
-        for(unsigned char i = 0; i < idx; i ++)
+        for(unsigned char i = 0; i < idx; i++)
         {
             sprintf(buff+i*2, "%02X", buffer[i]);
         }
-        buff[idx] = '\0';
 
         return;
     }
