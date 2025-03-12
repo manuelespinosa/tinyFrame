@@ -25,6 +25,8 @@ A lightweight library for microcontrollers to build and manage binary payloads, 
    ```cpp
    #include <tinyFrame.h>
 
+--- 
+
 ## Usage
 ### Basic Example
 ```cpp
@@ -106,16 +108,22 @@ val_uint16 = input.bytes[0] | input.bytes[1] << 8;
 val_uint8 = input.bytes[2];
 ```
 
+---
+
 ## Notes
 
     Buffer Size: The frame uses a fixed 255-byte buffer. Ensure your payload doesn’t exceed this limit to avoid overflow.
     Signed Integers: When using append_int*_t, the values are treated as signed, with appropriate bit-shifting for TTN decoding.
     Portability: Compatible with any microcontroller supporting C++ and a serial interface (e.g., Arduino, ESP32, STM32).
 
+---
+
 ## Limitations
 
     No built-in overflow protection (yet). Be mindful of the 255-byte limit when appending data.
     Debugging output relies on a serial port being available.
+
+---
 
 ## Contributing
 
