@@ -177,6 +177,8 @@ function decodeUplink(input) {
 }
 ```
 
+----------------
+## Old Version. Compatibility Only
 ### Key Methods
 
 ```
