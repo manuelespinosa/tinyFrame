@@ -98,6 +98,85 @@ case 0x01:  // FrameType::TEMPERATURA_SUELO
 // Similar for VWC...
 ```
 
+### Basic TNV decoder for TTN
+```
+function decodeUplink(input) {
+  var decoded = {};
+  var bytes = input.bytes;
+  var offset = 0;
+  var warnings = [];
+  var errors = [];
+
+  // Helper para leer uint16 (little-endian)
+  function readUint16(off) {
+    return bytes[off] | (bytes[off + 1] << 8);
+  }
+
+  // Helper para leer int16 (signed, si necesitas para temperaturas negativas)
+  function readInt16(off) {
+    var val = readUint16(off);
+    return val > 32767 ? val - 65536 : val;
+  }
+
+  // Mapa de longitudes implícitas y escalas (basado en enum FrameType)
+  // Ajusta escalas según tu lógica (e.g., /10 para temp, /100 para hum)
+  function getTypeInfo(type) {
+    switch (type) {
+      case 0x00: // VERSION (uint8)
+        return { len: 1, key: "version", scale: 1, signed: false };
+      case 0x01: // TEMPERATURA_SUELO (uint16 o int16)
+        return { len: 2, key: "temperatura_suelo", scale: 10, signed: false }; // Ej: /10 para °C
+      case 0x02: // HUMEDAD_SUELO (uint16)
+        return { len: 2, key: "humedad_suelo", scale: 100, signed: false }; // Ej: /100 para %
+      case 0x03: // VWC (uint16)
+        return { len: 2, key: "VWC", scale: 1, signed: false };
+      default:
+        return null; // Desconocido
+    }
+  }
+
+  while (offset < bytes.length) {
+    if (offset + 2 > bytes.length) { // Min: Type + Num
+      errors.push("Payload TNV incompleto");
+      break;
+    }
+
+    var type = bytes[offset++];
+    var num = bytes[offset++];
+    var info = getTypeInfo(type);
+
+    if (!info) {
+      warnings.push("Tipo desconocido: 0x" + type.toString(16));
+      continue; // Salta a próximo TNV
+    }
+
+    if (offset + info.len > bytes.length) {
+      errors.push("Longitud insuficiente para tipo 0x" + type.toString(16));
+      break;
+    }
+
+    var val;
+    if (info.len === 1) {
+      val = bytes[offset++];
+    } else if (info.len === 2) {
+      val = info.signed ? readInt16(offset) : readUint16(offset);
+      offset += 2;
+    } // Extiende para len=4 si agregas floats/uint32
+
+    // Aplica escala y guarda en decoded con índice (num)
+    var scaledVal = val / info.scale;
+    decoded[info.key + num] = Number.isInteger(scaledVal) ? scaledVal : scaledVal.toFixed(2);
+
+  }
+
+  return {
+    data: decoded,
+    warnings: warnings,
+    errors: errors
+  };
+}
+```
+
 ### Key Methods
 
 ```
